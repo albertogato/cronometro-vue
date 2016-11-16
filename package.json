@@ -1,0 +1,15 @@
+{
+  "name": "cronometro-vue",
+  "version": "1.0.0",
+  "description": "Un cronómetro hecho con vue.js.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alberto Gato Otero",
+  "license": "",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "vue": "^2.0.5"
+  }
+}

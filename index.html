@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Cronómetro</title>
+
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+
+        <style>
+            .row {
+                margin: 24px 0;
+            }
+
+            #tiempo {
+                font-size: 64px;
+                text-align: center;
+            }
+
+            #lista-tiempos {
+                font-size: 24px;
+                list-style-type: none;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                margin: 24px 0;
+                padding: 24px 0;
+                text-align: center;
+            }
+
+            #lista-tiempos li {
+                padding: 0;
+                margin: 0;
+            }
+
+            #total {
+                font-size: 24px;
+                margin: 24px 0;
+                text-align: center;
+            }
+
+            #total label {
+                padding-right: 24px;
+            }
+
+            button.btn {
+                display: block;
+                width: 100%;
+            }
+
+            button:focus {
+                outline: 0 none !important;
+            }
+
+            #boton-reiniciar {
+                width: 45%;
+                float: left;
+            }
+
+            #boton-agregar {
+                width: 45%;
+                float: right;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div id="app">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4">
+                        <div id="tiempo">
+                            <div>{{ tiempo | formateaTiempo }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4">
+                        <button type="button" id="boton-empezar-parar" v-on:click="pulsa" class="btn btn-primary btn-lg">{{ contando ? 'Parar' : 'Empezar' }}</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4">
+                        <button type="button" id="boton-reiniciar" v-on:click="reinicia" class="btn btn-default btn-lg">Reiniciar</button>
+                        <button type="button" id="boton-agregar" v-on:click="agregaTiempo" class="btn btn-default btn-lg" v-bind:disabled="(contando || tiempo == 0)">Agregar</button>
+                    </div>
+                </div>
+
+                <div class="row" v-if="tiempos.length > 0">
+                    <div class="col-md-4 col-md-offset-4">
+                        <ul id="lista-tiempos">
+                            <li v-for="tiempo in tiempos">{{ tiempo | formateaTiempo }}</li>
+                        </ul>
+
+                        <div id="total">
+                            <label>Total</label><span>{{ totalTiempos() | formateaTiempo }}</span>
+                        </div>
+
+                        <button type="button" id="boton-borrar-tiempos" v-on:click="borrarTiempos" class="btn btn-danger btn-lg">Borrar todos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
+        <script type="text/javascript">
+            (function() {
+
+                'use strict';
+
+                function pad(num, tam) {
+                    var s = num + '';
+
+                    while (s.length < tam) {
+                        s = '0' + s;
+                    }
+
+                    return s;
+                }
+
+                var app = new Vue({
+                    el: '#app',
+                    data: {
+                        tiempo: 0,
+                        contando: false,
+                        tiempos: []
+                    },
+                    created: function() {
+                        setInterval(this.actualizaTiempo, 1000);
+                    },
+                    methods: {
+                        tiempoFormateado: function() {
+                            return formateaTiempo(this.tiempo);
+                        },
+                        actualizaTiempo: function() {
+                            if(this.contando) {
+                                this.tiempo++;
+                            }
+                        },
+                        pulsa: function() {
+                            this.contando = !this.contando;
+                        },
+                        reinicia: function() {
+                            this.tiempo = 0;
+                        },
+                        agregaTiempo: function() {
+                            this.tiempos.push(this.tiempo);
+                            this.tiempo = 0;
+                        },
+                        borrarTiempos: function() {
+                            this.tiempos.splice(0, this.tiempos.length);
+                        },
+                        totalTiempos: function() {
+                            var total = 0;
+
+                            for(var i = 0; i < this.tiempos.length; i++) {
+                                total += this.tiempos[i];
+                            }
+
+                            return total;
+                        }
+                    },
+                    filters: {
+                        formateaTiempo: function(t) {
+                            var horas = parseInt(t / 3600);
+                            var minutos = parseInt(t / 60) % 60;
+                            var segundos = t % 60;
+                            var s = pad(horas, 2) + ':' + pad(minutos, 2) + ':' + pad(segundos, 2);
+
+                            return s;
+                        }
+                    }
+                })
+
+            })();
+        </script>
+    </body>
+</html>

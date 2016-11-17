@@ -105,6 +105,7 @@
         </div>
 
         <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
+        <script type="text/javascript" src="node_modules/vue-localstorage/vue-localstorage.min.js"></script>
         <script type="text/javascript">
             (function() {
 
@@ -120,6 +121,8 @@
                     return s;
                 }
 
+                Vue.use(VueLocalStorage);
+
                 var app = new Vue({
                     el: '#app',
                     data: {
@@ -128,6 +131,18 @@
                         tiempos: []
                     },
                     created: function() {
+                        var tiempos = this.$localStorage.get('tiempos');
+                        if(tiempos === null || tiempos === '') {
+                            this.tiempos = [];
+                        }
+                        else {
+                            tiempos = tiempos.split(',');
+                            for(var i = 0; i < tiempos.length; i++) {
+                                tiempos[i] = parseInt(tiempos[i]);
+                            }
+                            this.tiempos = tiempos;
+                        }
+
                         setInterval(this.actualizaTiempo, 1000);
                     },
                     methods: {
@@ -148,9 +163,13 @@
                         agregaTiempo: function() {
                             this.tiempos.push(this.tiempo);
                             this.tiempo = 0;
+
+                            this.$localStorage.set('tiempos', this.tiempos);
                         },
                         borrarTiempos: function() {
                             this.tiempos.splice(0, this.tiempos.length);
+
+                            this.$localStorage.set('tiempos', this.tiempos);
                         },
                         totalTiempos: function() {
                             var total = 0;

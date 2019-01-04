@@ -42,158 +42,142 @@
             #total label {
                 padding-right: 24px;
             }
-
-            button.btn {
-                display: block;
-                width: 100%;
-            }
-
-            button:focus {
-                outline: 0 none !important;
-            }
-
-            #boton-reiniciar {
-                width: 45%;
-                float: left;
-            }
-
-            #boton-agregar {
-                width: 45%;
-                float: right;
-            }
         </style>
     </head>
     <body>
-
         <div id="app">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4">
-                        <div id="tiempo">
-                            <div>{{ tiempo | formateaTiempo }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4">
-                        <button type="button" id="boton-empezar-parar" v-on:click="pulsa" class="btn btn-primary btn-lg">{{ contando ? 'Parar' : 'Empezar' }}</button>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4">
-                        <button type="button" id="boton-reiniciar" v-on:click="reinicia" class="btn btn-default btn-lg">Reiniciar</button>
-                        <button type="button" id="boton-agregar" v-on:click="agregaTiempo" class="btn btn-default btn-lg" v-bind:disabled="(contando || tiempo == 0)">Agregar</button>
-                    </div>
-                </div>
-
-                <div class="row" v-if="tiempos.length > 0">
-                    <div class="col-md-4 col-md-offset-4">
-                        <ul id="lista-tiempos">
-                            <li v-for="tiempo in tiempos">{{ tiempo | formateaTiempo }}</li>
-                        </ul>
-
-                        <div id="total">
-                            <label>Total</label><span>{{ totalTiempos() | formateaTiempo }}</span>
+                <div class="row justify-content-md-center">
+                    <div class="col-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
+                        <div class="row">
+                            <div class="col">
+                                <div id="tiempo">
+                                    <div>{{ tiempo | formateaTiempo }}</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <button type="button" id="boton-borrar-tiempos" v-on:click="borrarTiempos" class="btn btn-danger btn-lg">Borrar todos</button>
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" id="boton-empezar-parar" v-on:click="pulsa" class="btn btn-primary btn-lg btn-block">{{ contando ? 'Parar' : 'Empezar' }}</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="row no-gutters">
+                                    <div class="col-6">
+                                        <button type="button" id="boton-reiniciar" v-on:click="reinicia" class="btn btn-light btn-lg btn-block">Reiniciar</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="boton-agregar" v-on:click="agregaTiempo" class="btn btn-light btn-lg btn-block" v-bind:disabled="(contando || tiempo == 0)">Agregar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" v-if="tiempos.length > 0">
+                            <div class="col">
+                                <ul id="lista-tiempos">
+                                    <li v-for="tiempo in tiempos">{{ tiempo | formateaTiempo }}</li>
+                                </ul>
+
+                                <div id="total">
+                                    <label>Total</label><span>{{ totalTiempos() | formateaTiempo }}</span>
+                                </div>
+
+                                <button type="button" id="boton-borrar-tiempos" v-on:click="borrarTiempos" class="btn btn-danger btn-lg btn-block">Borrar todos</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <script type="text/javascript" src="node_modules/vue/dist/vue.min.js"></script>
-        <script type="text/javascript" src="node_modules/vue-localstorage/vue-localstorage.min.js"></script>
+        <script type="text/javascript" src="node_modules/vue-localstorage/dist/vue-local-storage.min.js"></script>
         <script type="text/javascript">
-            (function() {
+            function pad(num, tam) {
+                var s = num + '';
 
-                'use strict';
-
-                function pad(num, tam) {
-                    var s = num + '';
-
-                    while (s.length < tam) {
-                        s = '0' + s;
-                    }
-
-                    return s;
+                while (s.length < tam) {
+                    s = '0' + s;
                 }
 
-                Vue.use(VueLocalStorage);
+                return s;
+            }
 
-                var app = new Vue({
-                    el: '#app',
-                    data: {
-                        tiempo: 0,
-                        contando: false,
-                        tiempos: []
-                    },
-                    created: function() {
-                        var tiempos = this.$localStorage.get('tiempos');
-                        if(tiempos === null || tiempos === '') {
-                            this.tiempos = [];
-                        }
-                        else {
-                            tiempos = tiempos.split(',');
-                            for(var i = 0; i < tiempos.length; i++) {
-                                tiempos[i] = parseInt(tiempos[i]);
-                            }
-                            this.tiempos = tiempos;
-                        }
+            Vue.use(VueLocalStorage);
 
-                        setInterval(this.actualizaTiempo, 1000);
-                    },
-                    methods: {
-                        tiempoFormateado: function() {
-                            return formateaTiempo(this.tiempo);
-                        },
-                        actualizaTiempo: function() {
-                            if(this.contando) {
-                                this.tiempo++;
-                            }
-                        },
-                        pulsa: function() {
-                            this.contando = !this.contando;
-                        },
-                        reinicia: function() {
-                            this.tiempo = 0;
-                        },
-                        agregaTiempo: function() {
-                            this.tiempos.push(this.tiempo);
-                            this.tiempo = 0;
-
-                            this.$localStorage.set('tiempos', this.tiempos);
-                        },
-                        borrarTiempos: function() {
-                            this.tiempos.splice(0, this.tiempos.length);
-
-                            this.$localStorage.set('tiempos', this.tiempos);
-                        },
-                        totalTiempos: function() {
-                            var total = 0;
-
-                            for(var i = 0; i < this.tiempos.length; i++) {
-                                total += this.tiempos[i];
-                            }
-
-                            return total;
-                        }
-                    },
-                    filters: {
-                        formateaTiempo: function(t) {
-                            var horas = parseInt(t / 3600);
-                            var minutos = parseInt(t / 60) % 60;
-                            var segundos = t % 60;
-                            var s = pad(horas, 2) + ':' + pad(minutos, 2) + ':' + pad(segundos, 2);
-
-                            return s;
-                        }
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    tiempo: 0,
+                    contando: false,
+                    tiempos: []
+                },
+                created: function() {
+                    var tiempos = this.$localStorage.get('tiempos');
+                    if(tiempos === null || tiempos === '') {
+                        this.tiempos = [];
                     }
-                })
+                    else {
+                        tiempos = tiempos.split(',');
+                        for(var i = 0; i < tiempos.length; i++) {
+                            tiempos[i] = parseInt(tiempos[i]);
+                        }
+                        this.tiempos = tiempos;
+                    }
 
-            })();
+                    setInterval(this.actualizaTiempo, 1000);
+                },
+                methods: {
+                    tiempoFormateado: function() {
+                        return formateaTiempo(this.tiempo);
+                    },
+                    actualizaTiempo: function() {
+                        if(this.contando) {
+                            this.tiempo++;
+                        }
+                    },
+                    pulsa: function() {
+                        this.contando = !this.contando;
+                    },
+                    reinicia: function() {
+                        this.tiempo = 0;
+                    },
+                    agregaTiempo: function() {
+                        this.tiempos.push(this.tiempo);
+                        this.tiempo = 0;
+
+                        this.$localStorage.set('tiempos', this.tiempos);
+                    },
+                    borrarTiempos: function() {
+                        this.tiempos.splice(0, this.tiempos.length);
+
+                        this.$localStorage.set('tiempos', this.tiempos);
+                    },
+                    totalTiempos: function() {
+                        var total = 0;
+
+                        for(var i = 0; i < this.tiempos.length; i++) {
+                            total += this.tiempos[i];
+                        }
+
+                        return total;
+                    }
+                },
+                filters: {
+                    formateaTiempo: function(t) {
+                        var horas = parseInt(t / 3600);
+                        var minutos = parseInt(t / 60) % 60;
+                        var segundos = t % 60;
+                        var s = pad(horas, 2) + ':' + pad(minutos, 2) + ':' + pad(segundos, 2);
+
+                        return s;
+                    }
+                }
+            })
         </script>
     </body>
 </html>

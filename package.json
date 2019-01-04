@@ -9,8 +9,8 @@
   "author": "Alberto Gato Otero",
   "license": "",
   "dependencies": {
-    "bootstrap": "^3.3.7",
-    "vue": "^2.0.5",
-    "vue-localstorage": "^0.1.2"
+    "bootstrap": "^4.2.1",
+    "vue": "^2.5.21",
+    "vue-localstorage": "^0.6.2"
   }
 }
